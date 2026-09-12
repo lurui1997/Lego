@@ -1,0 +1,8 @@
+{
+  "name": "weread-progress",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/label.test.js"
+  }
+}
