@@ -1,0 +1,9 @@
+{
+  "name": "weread-highlights",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node src/cli.js",
+    "test": "node --test test/parse.test.js test/format.test.js"
+  }
+}
