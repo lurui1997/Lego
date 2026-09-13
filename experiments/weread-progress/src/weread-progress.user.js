@@ -1,15 +1,16 @@
 // ==UserScript==
 // @name         微信读书书架进度
 // @namespace    https://github.com/lurui1997/Lego
-// @version      0.1.1
+// @version      0.1.3
 // @description  在微信读书网页版书架 / 书单上展示「读完」与「已读到 x%」
 // @homepageURL  https://github.com/lurui1997/Lego/tree/main/experiments/weread-progress
 // @downloadURL  https://raw.githubusercontent.com/lurui1997/Lego/main/experiments/weread-progress/src/weread-progress.user.js
 // @updateURL    https://raw.githubusercontent.com/lurui1997/Lego/main/experiments/weread-progress/src/weread-progress.user.js
-// @match        https://weread.qq.com/web/shelf
-// @match        https://weread.qq.com/web/shelf/*
+// @match        *://weread.qq.com/*
+// @include      https://weread.qq.com/*
 // @run-at       document-idle
-// @grant        none
+// @inject-into  content
+// @grant        GM_addStyle
 // ==/UserScript==
 
 (() => {
@@ -145,6 +146,12 @@
     };
   }
 
+  function cardTitle(card) {
+    const el = card.querySelector(".title");
+    if (!el) return "";
+    return (el.getAttribute("title") || el.textContent || "").trim();
+  }
+
   async function shelfIndex() {
     const data = await fetchJson("/web/shelf/sync");
     const books = Array.isArray(data?.books) ? data.books : [];
@@ -218,7 +225,7 @@
     if (bookId && shelf.has(String(bookId))) {
       return { ...local, ...shelf.get(String(bookId)) };
     }
-    const title = card.querySelector(".title")?.textContent?.trim();
+    const title = cardTitle(card);
     if (title) {
       for (const book of shelf.values()) {
         if (book.title === title) return { ...local, ...book };
@@ -245,10 +252,25 @@
   }
 
   let timer = 0;
+  let running = false;
+  let pending = false;
   function schedule() {
+    if (running) {
+      pending = true;
+      return;
+    }
     window.clearTimeout(timer);
     timer = window.setTimeout(() => {
-      enhance().catch(() => {});
+      running = true;
+      enhance()
+        .catch(() => {})
+        .finally(() => {
+          running = false;
+          if (pending) {
+            pending = false;
+            schedule();
+          }
+        });
     }, 200);
   }
 

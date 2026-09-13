@@ -16,6 +16,8 @@
 
 Chrome 已装 Tampermonkey（v5.5.0）。Chrome 138+ 必须先打开扩展详情里的 **允许用户脚本**，否则仪表盘会提示「没有安装任何脚本」。
 
+微信读书 CSP 的 `script-src` 不含 `blob:`。脚本用 `@inject-into content` 和 `@grant GM_addStyle` 走扩展隔离世界，避免被页面 CSP 拦掉。
+
 1. 打开 [篡改猴详情](chrome://extensions/?id=dhdgffkkebhmkfjojejmpbldmpobfkfo)
 2. 打开 **允许用户脚本**
 3. 安装脚本（任选其一）：
