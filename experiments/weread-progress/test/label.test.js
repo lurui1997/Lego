@@ -35,8 +35,22 @@ describe("progressLabel", () => {
     });
   });
 
-  it("uses finishReading from shelf sync", () => {
+  it("uses finishReading from shelf sync, not book.finished", () => {
     assert.equal(isFinished({ progress: 80, finishReading: 1 }), true);
     assert.equal(progressLabel({ progress: 80, finishReading: 1 }).text, "读完");
+    assert.equal(isFinished({ progress: 68, finished: 1, finishReading: 0 }), false);
+    assert.deepEqual(progressLabel({ progress: 68, finished: 1, finishReading: 0 }), {
+      kind: "reading",
+      text: "已读到 68%",
+      percent: 68,
+    });
+  });
+
+  it("treats readingTime with 0 percent as started", () => {
+    assert.deepEqual(progressLabel({ progress: 0, readingTime: 81, finished: 1 }), {
+      kind: "reading",
+      text: "已读到 0%",
+      percent: 0,
+    });
   });
 });

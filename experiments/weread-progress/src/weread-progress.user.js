@@ -1,8 +1,11 @@
 // ==UserScript==
 // @name         微信读书书架进度
 // @namespace    https://github.com/lurui1997/Lego
-// @version      0.1.0
+// @version      0.1.1
 // @description  在微信读书网页版书架 / 书单上展示「读完」与「已读到 x%」
+// @homepageURL  https://github.com/lurui1997/Lego/tree/main/experiments/weread-progress
+// @downloadURL  https://raw.githubusercontent.com/lurui1997/Lego/main/experiments/weread-progress/src/weread-progress.user.js
+// @updateURL    https://raw.githubusercontent.com/lurui1997/Lego/main/experiments/weread-progress/src/weread-progress.user.js
 // @match        https://weread.qq.com/web/shelf
 // @match        https://weread.qq.com/web/shelf/*
 // @run-at       document-idle
@@ -23,11 +26,16 @@
 
   function isFinished(book) {
     if (!book || typeof book !== "object") return false;
-    const progress = normalizeProgress(book.progress);
-    if (progress === 100) return true;
+    if (normalizeProgress(book.progress) === 100) return true;
     if (book.finishReading === 1 || book.finishReading === true) return true;
-    if (book.finished === 1 || book.finished === true) return true;
-    if (book.finishTime) return true;
+    return false;
+  }
+
+  function hasStarted(book) {
+    if (!book || typeof book !== "object") return false;
+    if (normalizeProgress(book.progress) > 0) return true;
+    if (book.isStartReading === 1 || book.isStartReading === true) return true;
+    if (Number(book.readingTime) > 0) return true;
     return false;
   }
 
@@ -36,7 +44,7 @@
     if (isFinished(book)) {
       return { kind: "finished", text: "读完", percent: 100 };
     }
-    if (percent > 0) {
+    if (hasStarted(book)) {
       return { kind: "reading", text: `已读到 ${percent}%`, percent };
     }
     return { kind: "unread", text: "未开始", percent: 0 };
@@ -140,9 +148,20 @@
   async function shelfIndex() {
     const data = await fetchJson("/web/shelf/sync");
     const books = Array.isArray(data?.books) ? data.books : [];
+    const progressById = new Map();
+    for (const row of data?.bookProgress || []) {
+      if (row?.bookId != null) progressById.set(String(row.bookId), row);
+    }
     const map = new Map();
     for (const book of books) {
-      if (book?.bookId) map.set(String(book.bookId), book);
+      if (!book?.bookId) continue;
+      const extra = progressById.get(String(book.bookId));
+      map.set(String(book.bookId), {
+        ...book,
+        progress: extra?.progress ?? book.progress,
+        readingTime: extra?.readingTime ?? book.readingTime,
+        isStartReading: extra?.isStartReading ?? book.isStartReading,
+      });
     }
     return map;
   }
@@ -184,8 +203,15 @@
 
   async function resolveBook(card) {
     const local = bookFromCard(card);
-    if (local && (local.progress != null || local.finishReading != null)) {
-      return local;
+    if (
+      local &&
+      (local.progress != null ||
+        local.finishReading != null ||
+        local.readingTime != null)
+    ) {
+      const shelf = await getShelf();
+      const extra = local.bookId ? shelf.get(String(local.bookId)) : null;
+      return extra ? { ...local, ...extra } : local;
     }
     const bookId = local?.bookId;
     const shelf = await getShelf();

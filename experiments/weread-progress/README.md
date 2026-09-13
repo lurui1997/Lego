@@ -14,9 +14,14 @@
 
 ## 安装
 
-1. 安装 [Tampermonkey](https://www.tampermonkey.net/)
-2. 新建脚本，粘贴 [`src/weread-progress.user.js`](src/weread-progress.user.js)
-3. 打开已登录的 [书架](https://weread.qq.com/web/shelf) 或书单页，例如 `/web/shelf/archive/...`
+Chrome 已装 Tampermonkey（v5.5.0）。Chrome 138+ 必须先打开扩展详情里的 **允许用户脚本**，否则仪表盘会提示「没有安装任何脚本」。
+
+1. 打开 [篡改猴详情](chrome://extensions/?id=dhdgffkkebhmkfjojejmpbldmpobfkfo)
+2. 打开 **允许用户脚本**
+3. 安装脚本（任选其一）：
+   - 打开 [GitHub 源文件](https://raw.githubusercontent.com/lurui1997/Lego/main/experiments/weread-progress/src/weread-progress.user.js)，点「安装」
+   - 或把 [`src/weread-progress.user.js`](src/weread-progress.user.js) 粘进 Tampermonkey 新建脚本
+4. 打开已登录的 [书架](https://weread.qq.com/web/shelf) 或书单页
 
 脚本只读当前登录态下的同域接口，不上传账号。
 
