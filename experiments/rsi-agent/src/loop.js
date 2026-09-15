@@ -1,13 +1,15 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
 import { runCursorTurn } from "./cursor.js";
 import { runCommand } from "./exec.js";
 import { commitIteration, initSnapshot, resetHard } from "./git.js";
 import { freezeAcceptance, loadTask, readFrozenAcceptance } from "./task.js";
 import { experimentRoot } from "./paths.js";
+import { saveRunRecord } from "./records.js";
 import { smoke } from "./smoke.js";
 import { listTree } from "./tree.js";
+import { exportSite } from "./export-site.js";
 
 function runId() {
   return new Date().toISOString().replace(/[:.]/g, "-");
@@ -30,6 +32,15 @@ export async function buildTurnPrompt({ root, task, frozen, iteration, notes }) 
   ].join("\n\n");
 }
 
+async function archiveRun(root, record) {
+  try {
+    await saveRunRecord(root, record);
+    await exportSite(root);
+  } catch {
+    /* archive is best-effort so a full disk does not fail the run */
+  }
+}
+
 export async function runLoop({
   taskDir,
   root = experimentRoot(),
@@ -42,6 +53,7 @@ export async function runLoop({
   await freezeAcceptance(runDir, task.acceptance);
   let lastGood = await initSnapshot(root, runDir);
   const notes = [];
+  let result = { ok: false, runDir, iterations: task.maxIterations };
 
   for (let i = 1; i <= task.maxIterations; i += 1) {
     if (i > 1 && task.intervalSeconds > 0) {
@@ -81,8 +93,19 @@ export async function runLoop({
     await writeFile(join(runDir, "iters", `${i}.md`), log, "utf8");
     notes.push(log);
     if (accepted.ok) {
-      return { ok: true, runDir, iterations: i };
+      result = { ok: true, runDir, iterations: i };
+      break;
     }
   }
-  return { ok: false, runDir, iterations: task.maxIterations };
+
+  await archiveRun(root, {
+    id,
+    taskId: basename(taskDir),
+    goal: task.goal,
+    ok: result.ok,
+    iterations: result.iterations,
+    acceptance: task.acceptance,
+    summary: notes.at(-1) ?? "",
+  });
+  return result;
 }

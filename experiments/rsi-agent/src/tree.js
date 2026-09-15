@@ -1,7 +1,7 @@
 import { readdir } from "node:fs/promises";
 import { join, relative } from "node:path";
 
-const SKIP = new Set(["state", "node_modules", ".git"]);
+const SKIP = new Set(["state", "node_modules", ".git", "web"]);
 
 export async function listTree(root, dir = root, acc = []) {
   const entries = await readdir(dir, { withFileTypes: true });

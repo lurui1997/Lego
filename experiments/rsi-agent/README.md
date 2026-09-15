@@ -13,9 +13,14 @@
 export RSI_CURSOR_BIN=agent          # 或 cursor-agent 的绝对路径
 export RSI_MODEL=                     # 传给 agent --model
 export RSI_CURSOR_TIMEOUT_MS=600000
+export RSI_WEB_PORT=3847            # npm run web
 
 npm test
 node src/cli.js run tasks/retry-on-429
+
+# 产品页（苹果官网式布局）
+npm run web
+# 打开 http://127.0.0.1:3847/
 ```
 
 每轮等价于：
@@ -47,4 +52,16 @@ agent --print --trust --force --sandbox disabled --workspace <本实验根> --ou
 - 不可改：当次冻结验收文件。
 - 每轮冒烟：`node --check src/cli.js` 和 `node src/cli.js --help`。失败则回滚到上一份冒烟通过的快照。
 - 快照用独立 `GIT_DIR`，不往 Lego 仓库提交。
+- 运行摘要写入 `web/data/runs.json`（会进站点；完整快照仍在被忽略的 `state/`）。
 - 不自动 push。
+
+## 公网站点
+
+循环结束后会更新 `web/data/runs.json` 和 `web/data/site.json`。推到 `main` 后，GitHub Pages 发布：
+
+https://lurui1997.github.io/Lego/
+
+```sh
+npm run export-site
+npm run web
+```

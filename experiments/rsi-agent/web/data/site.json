@@ -1,0 +1,12 @@
+{
+  "tasks": [
+    {
+      "id": "retry-on-429",
+      "goal": "LLM 返回 429 时自动重试一次再失败",
+      "acceptance": "node --test test/retry.test.js",
+      "maxIterations": 5,
+      "intervalSeconds": 0
+    }
+  ],
+  "runs": []
+}
