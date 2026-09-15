@@ -55,6 +55,8 @@ agent --print --trust --force --sandbox disabled --workspace <本实验根> --ou
 - 运行摘要写入 `web/data/runs.json`（会进站点；完整快照仍在被忽略的 `state/`）。
 - 不自动 push。
 
+本机 `npm run web` 打开的站点可以发起任务：`POST /api/run`。GitHub Pages 是静态站，不能拉起 Cursor CLI。
+
 ## 公网站点
 
 循环结束后会更新 `web/data/runs.json` 和 `web/data/site.json`。推到 `main` 后，GitHub Pages 发布：

@@ -6,6 +6,8 @@ import { loadSitePayload } from "./web-data.js";
 
 export async function exportSite(root = experimentRoot()) {
   const payload = await loadSitePayload(root);
+  payload.launch = false;
+  payload.job = { status: "idle" };
   const dir = join(root, "web", "data");
   await mkdir(dir, { recursive: true });
   const dest = join(dir, "site.json");

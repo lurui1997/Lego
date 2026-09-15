@@ -6,6 +6,6 @@
     "start": "node src/cli.js",
     "web": "node src/web-server.js",
     "export-site": "node src/export-site.js",
-    "test": "node --test test/paths.test.js test/task.test.js test/git.test.js test/cursor.test.js test/web-data.test.js test/web-server.test.js test/records.test.js"
+    "test": "node --test test/paths.test.js test/task.test.js test/git.test.js test/cursor.test.js test/web-data.test.js test/web-server.test.js test/records.test.js test/launch.test.js"
   }
 }

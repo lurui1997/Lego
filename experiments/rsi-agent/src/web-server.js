@@ -4,6 +4,8 @@ import { extname, join, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { experimentRoot } from "./paths.js";
 import { loadSitePayload } from "./web-data.js";
+import { createJobRunner } from "./launch.js";
+import { runLoop } from "./loop.js";
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -25,6 +27,38 @@ function send(res, status, body, headers = {}) {
   res.end(payload);
 }
 
+function readJson(req, limit = 64_000) {
+  return new Promise((resolveBody, reject) => {
+    const chunks = [];
+    let n = 0;
+    req.on("data", (chunk) => {
+      n += chunk.length;
+      if (n > limit) {
+        const err = new Error("请求体过大");
+        err.status = 413;
+        reject(err);
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on("end", () => {
+      if (!chunks.length) {
+        resolveBody({});
+        return;
+      }
+      try {
+        resolveBody(JSON.parse(Buffer.concat(chunks).toString("utf8")));
+      } catch {
+        const err = new Error("JSON 无效");
+        err.status = 400;
+        reject(err);
+      }
+    });
+    req.on("error", reject);
+  });
+}
+
 export function safeJoin(root, urlPath) {
   let decoded;
   try {
@@ -38,18 +72,34 @@ export function safeJoin(root, urlPath) {
   return abs;
 }
 
-export function createWebServer({ root = experimentRoot() } = {}) {
+export function createWebServer({
+  root = experimentRoot(),
+  runLoop: runLoopImpl = runLoop,
+} = {}) {
   const webRoot = join(root, "web");
+  const jobs = createJobRunner({ root, runLoop: runLoopImpl });
   return createServer(async (req, res) => {
     try {
       const pathname = (req.url || "/").split("?")[0] || "/";
+      if (req.method === "POST" && pathname === "/api/run") {
+        const body = await readJson(req);
+        const job = await jobs.start(body);
+        send(res, 202, job, { "Content-Type": "application/json; charset=utf-8" });
+        return;
+      }
       if (req.method !== "GET" && req.method !== "HEAD") {
         send(res, 405, "Method Not Allowed", { "Content-Type": "text/plain; charset=utf-8" });
         return;
       }
       if (pathname === "/api/site") {
         const payload = await loadSitePayload(root);
+        payload.launch = true;
+        payload.job = jobs.snapshot();
         send(res, 200, payload, { "Content-Type": "application/json; charset=utf-8" });
+        return;
+      }
+      if (pathname === "/api/job") {
+        send(res, 200, jobs.snapshot(), { "Content-Type": "application/json; charset=utf-8" });
         return;
       }
       const path = pathname === "/" ? "/index.html" : pathname;
@@ -67,11 +117,15 @@ export function createWebServer({ root = experimentRoot() } = {}) {
       const buf = await readFile(file);
       send(res, 200, buf, { "Content-Type": type });
     } catch (err) {
-      if (err && err.code === "ENOENT") {
+      const status = Number(err?.status) || (err && err.code === "ENOENT" ? 404 : 500);
+      if (status === 404) {
         send(res, 404, "Not Found", { "Content-Type": "text/plain; charset=utf-8" });
         return;
       }
-      send(res, 500, "Internal Server Error", { "Content-Type": "text/plain; charset=utf-8" });
+      const message = err instanceof Error ? err.message : "Internal Server Error";
+      send(res, status >= 400 && status < 600 ? status : 500, { error: message }, {
+        "Content-Type": "application/json; charset=utf-8",
+      });
     }
   });
 }

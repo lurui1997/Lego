@@ -28,7 +28,7 @@
           <li><a href="#guardrails">边界</a></li>
           <li><a href="#tasks">任务</a></li>
           <li><a href="#runs">运行</a></li>
-          <li><a href="#start">开始</a></li>
+          <li><a href="#start">发起</a></li>
         </ul>
       </nav>
     </header>
@@ -51,7 +51,7 @@
             <p class="availability">本机 Cursor CLI · 冻结验收 · 冒烟回滚</p>
             <div class="cta">
               <a class="btn btn-primary" href="#loop">了解循环</a>
-              <a class="btn btn-ghost" href="#start">立刻运行</a>
+              <a class="btn btn-ghost" href="#start">发起任务</a>
             </div>
           </div>
         </div>
@@ -136,15 +136,37 @@
       </section>
 
       <section class="unit unit-dark start" id="start">
-        <p class="eyebrow">Get started</p>
-        <h2>一条命令，开始循环。</h2>
-        <p class="lede light">可选环境变量：<code>RSI_CURSOR_BIN</code>、<code>RSI_MODEL</code>、<code>RSI_CURSOR_TIMEOUT_MS</code>。</p>
-        <div class="terminal" role="region" aria-label="启动命令">
-          <div class="traffic" aria-hidden="true"><span></span><span></span><span></span></div>
-          <pre><code>cd experiments/rsi-agent
-npm test
-node src/cli.js run tasks/retry-on-429</code></pre>
-        </div>
+        <p class="eyebrow">Start a run</p>
+        <h2>在站点上发起任务。</h2>
+        <p class="lede light" id="launch-hint">
+          选择已有任务，或填写新的目标与冻结验收。本机 <code>npm run web</code> 会调用 Cursor CLI。
+        </p>
+        <form class="launch" id="launch-form">
+          <label for="task-select">已有任务</label>
+          <select id="task-select" name="taskId">
+            <option value="">新建任务</option>
+          </select>
+          <div id="custom-fields">
+            <label for="task-id">任务 id</label>
+            <input id="task-id" name="newTaskId" placeholder="retry-on-429" autocomplete="off" />
+            <label for="task-goal">目标</label>
+            <textarea id="task-goal" name="goal" placeholder="LLM 返回 429 时自动重试一次再失败"></textarea>
+            <label for="task-acceptance">冻结验收</label>
+            <input id="task-acceptance" name="acceptance" placeholder="node --test test/retry.test.js" />
+            <div class="row">
+              <div>
+                <label for="task-iters">最多轮次</label>
+                <input id="task-iters" name="max_iterations" type="number" min="1" max="20" value="5" />
+              </div>
+              <div>
+                <label for="task-interval">间隔（秒）</label>
+                <input id="task-interval" name="interval_seconds" type="number" min="0" max="3600" value="0" />
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary" type="submit" id="launch-submit">发起循环</button>
+          <p class="status-line" id="launch-status" role="status"></p>
+        </form>
       </section>
     </main>
 
@@ -164,7 +186,7 @@ node src/cli.js run tasks/retry-on-429</code></pre>
         <div>
           <h2>运行</h2>
           <ul>
-            <li><a href="#start">开始</a></li>
+            <li><a href="#start">发起任务</a></li>
             <li><a href="#runs">运行记录</a></li>
           </ul>
         </div>

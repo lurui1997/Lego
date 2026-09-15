@@ -8,5 +8,9 @@
       "intervalSeconds": 0
     }
   ],
-  "runs": []
+  "runs": [],
+  "launch": false,
+  "job": {
+    "status": "idle"
+  }
 }
