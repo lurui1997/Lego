@@ -9,7 +9,7 @@
       name="description"
       content="人写任务与冻结验收，本机 Cursor CLI 循环改代码，直到通过。搞挂入口就回滚。"
     />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=launch2" />
   </head>
   <body>
     <a class="skip" href="#main">跳到内容</a>
@@ -135,36 +135,49 @@
         </div>
       </section>
 
-      <section class="unit unit-dark start" id="start">
-        <p class="eyebrow">Start a run</p>
-        <h2>在站点上发起任务。</h2>
-        <p class="lede light" id="launch-hint">
-          选择已有任务，或填写新的目标与冻结验收。本机 <code>npm run web</code> 会调用 Cursor CLI。
-        </p>
-        <form class="launch" id="launch-form">
-          <label for="task-select">已有任务</label>
-          <select id="task-select" name="taskId">
-            <option value="">新建任务</option>
-          </select>
-          <div id="custom-fields">
-            <label for="task-id">任务 id</label>
-            <input id="task-id" name="newTaskId" placeholder="retry-on-429" autocomplete="off" />
-            <label for="task-goal">目标</label>
-            <textarea id="task-goal" name="goal" placeholder="LLM 返回 429 时自动重试一次再失败"></textarea>
-            <label for="task-acceptance">冻结验收</label>
-            <input id="task-acceptance" name="acceptance" placeholder="node --test test/retry.test.js" />
-            <div class="row">
-              <div>
+      <section class="unit unit-gray start" id="start">
+        <p class="eyebrow dark">Start a run</p>
+        <h2>发起一次循环。</h2>
+        <p class="lede" id="launch-hint">选一个已有任务，或写下新的目标与冻结验收。</p>
+        <form class="sheet" id="launch-form" autocomplete="off">
+          <div class="field">
+            <label for="task-select">任务</label>
+            <div class="select-wrap">
+              <select id="task-select" name="taskId">
+                <option value="">新建任务</option>
+              </select>
+            </div>
+          </div>
+          <div id="custom-fields" class="sheet-extra">
+            <div class="field">
+              <label for="task-id">标识</label>
+              <input id="task-id" name="newTaskId" placeholder="retry-on-429" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label for="task-goal">目标</label>
+              <textarea id="task-goal" name="goal" rows="3" placeholder="LLM 返回 429 时自动重试一次再失败"></textarea>
+            </div>
+            <div class="field">
+              <label for="task-acceptance">冻结验收</label>
+              <input
+                id="task-acceptance"
+                name="acceptance"
+                placeholder="node --test test/retry.test.js"
+                spellcheck="false"
+              />
+            </div>
+            <div class="field-pair">
+              <div class="field">
                 <label for="task-iters">最多轮次</label>
                 <input id="task-iters" name="max_iterations" type="number" min="1" max="20" value="5" />
               </div>
-              <div>
+              <div class="field">
                 <label for="task-interval">间隔（秒）</label>
                 <input id="task-interval" name="interval_seconds" type="number" min="0" max="3600" value="0" />
               </div>
             </div>
           </div>
-          <button class="btn btn-primary" type="submit" id="launch-submit">发起循环</button>
+          <button class="btn btn-primary sheet-cta" type="submit" id="launch-submit">发起循环</button>
           <p class="status-line" id="launch-status" role="status"></p>
         </form>
       </section>
@@ -202,6 +215,6 @@
       </div>
       <p class="copy">Copyright © RSI Agent. 本地实验界面。</p>
     </footer>
-    <script src="app.js" type="module"></script>
+    <script src="app.js?v=launch2" type="module"></script>
   </body>
 </html>

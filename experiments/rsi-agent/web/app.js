@@ -24,9 +24,9 @@ function renderTasks(tasks) {
         <p class="meta">最多 ${escapeHtml(task.maxIterations)} 轮 · 间隔 ${escapeHtml(
           task.intervalSeconds,
         )} 秒<br />验收 <code>${escapeHtml(task.acceptance)}</code></p>
-        <button class="btn btn-primary launch-existing" type="button" data-task="${escapeHtml(
+        <button class="more launch-existing" type="button" data-task="${escapeHtml(
           task.id,
-        )}">发起此任务</button>
+        )}">发起</button>
       </article>`),
     ),
   );
