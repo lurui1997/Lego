@@ -1,6 +1,6 @@
 # 微信读书划线导出
 
-对应任务：[Weread Highlights Export](https://github.com/users/lurui1997/projects/1/views/1?pane=issue&issue=lurui1997%7Ckeel%7C3)（[keel#3](https://github.com/lurui1997/keel/issues/3)）。
+对应任务：[Weread Highlights Export](https://github.com/users/lurui1997/projects/1/views/1?pane=issue&itemId=247549149&issue=lurui1997%7CLego%7C2)。
 
 读 Obsidian 里 [obsidian-weread-plugin](https://github.com/zhaohongxuan/obsidian-weread-plugin) 同步下来的书笔记，去掉封面、`weread://` 链接和重复的「读书笔记」块，收成一份人和模型都能扫的文本。
 
