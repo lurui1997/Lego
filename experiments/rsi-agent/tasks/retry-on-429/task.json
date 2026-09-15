@@ -1,0 +1,6 @@
+{
+  "goal": "LLM 返回 429 时自动重试一次再失败",
+  "acceptance": "node --test test/retry.test.js",
+  "max_iterations": 5,
+  "interval_seconds": 0
+}

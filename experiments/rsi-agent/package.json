@@ -1,0 +1,9 @@
+{
+  "name": "rsi-agent",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test test/paths.test.js test/task.test.js test/git.test.js test/cursor.test.js"
+  }
+}

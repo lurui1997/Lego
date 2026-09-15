@@ -11,6 +11,7 @@ docs/                 说明与索引
 experiments/          独立实验，互不耦合
   weread-progress/    微信读书网页版阅读进度
   weread-highlights/  微信读书划线导出
+  rsi-agent/          自进化 Agent：计划-实现-迭代
 ```
 
 每个实验自带 README：问题、做法、怎么跑。
@@ -21,6 +22,7 @@ experiments/          独立实验，互不耦合
 | --- | --- | --- |
 | [weread-progress](experiments/weread-progress/README.md) | 网页书架展示「读完 / 已读到 x%」 | 可用油猴脚本 |
 | [weread-highlights](experiments/weread-highlights/README.md) | 从 Obsidian 导出可读划线文本 | `npm run build` |
+| [rsi-agent](experiments/rsi-agent/README.md) | 人设任务/验收/频率，本机 `agent` CLI 自改代码迭代 | `npm test`；真跑需已登录 Cursor CLI |
 
 ## 约定
 

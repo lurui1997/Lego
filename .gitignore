@@ -4,3 +4,4 @@ node_modules/
 .venv/
 dist/
 experiments/weread-highlights/out/
+experiments/rsi-agent/state/
